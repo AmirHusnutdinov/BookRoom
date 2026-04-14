@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    container_name: bookroom_flask
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+
+
+
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    command: flask run --host=0.0.0.0 --port=5000 --debug
+    

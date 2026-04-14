@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Мои бронирования{% endblock %}
+
+{% block content %}
+<h1>👤 Мои бронирования</h1>
+
+<section class="dashboard-section">
+    <h2>🟢 Предстоящие</h2>
+    {% if upcoming %}
+    <div class="booking-list">
+        {% for b in upcoming %}
+        <div class="booking-card">
+            <div class="booking-info">
+                <h3>{{ b.room_name }}</h3>
+                <p>📅 {{ b.booking_date }} &nbsp; 🕐 {{ b.start_time }} — {{ b.end_time }}</p>
+                {% if b.purpose %}<p>📝 {{ b.purpose }}</p>{% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('cancel_booking', booking_id=b.id) }}"
+                  onsubmit="return confirm('Отменить бронирование?');">
+                <button class="btn btn-danger">Отменить</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">Предстоящих бронирований нет.</p>
+    {% endif %}
+</section>
+
+<section class="dashboard-section">
+    <h2>🔴 Прошедшие</h2>
+    {% if past %}
+    <div class="booking-list">
+        {% for b in past %}
+        <div class="booking-card past">
+            <div class="booking-info">
+                <h3>{{ b.room_name }}</h3>
+                <p>📅 {{ b.booking_date }} &nbsp; 🕐 {{ b.start_time }} — {{ b.end_time }}</p>
+                {% if b.purpose %}<p>📝 {{ b.purpose }}</p>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">Прошедших бронирований нет.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Календарь{% endblock %}
+
+{% block content %}
+<h1>📅 Календарь занятости</h1>
+
+<div class="calendar-filters">
+    <form method="GET" class="form-inline">
+        <div class="form-group">
+            <label>Дата:</label>
+            <input type="date" name="date" value="{{ selected_date }}">
+        </div>
+        <div class="form-group">
+            <label>Комната:</label>
+            <select name="room_id">
+                <option value="">Все комнаты</option>
+                {% for r in rooms %}
+                    <option value="{{ r.id }}" {% if selected_room == r.id %}selected{% endif %}>
+                        {{ r.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Показать</button>
+    </form>
+</div>
+
+<div class="calendar-grid">
+    {% for booking in bookings %}
+    <div class="calendar-item" data-room="{{ booking.room_name }}">
+        <div class="calendar-time">{{ booking.start_time }} — {{ booking.end_time }}</div>
+        <div class="calendar-room">{{ booking.room_name }}</div>
+        <div class="calendar-user">👤 {{ booking.username }}</div>
+        {% if booking.purpose %}
+            <div class="calendar-purpose">📝 {{ booking.purpose }}</div>
+        {% endif %}
+    </div>
+    {% else %}
+    <p class="text-muted">На {{ selected_date }} бронирований нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Комнаты{% endblock %}
+
+{% block content %}
+<h1>📋 Доступные комнаты</h1>
+
+{% if not rooms %}
+    <p class="text-muted">Комнаты пока не добавлены.</p>
+{% endif %}
+
+<div class="rooms-grid">
+    {% for room in rooms %}
+    <div class="room-card">
+        {% if room.image_url %}
+            <img src="{{ room.image_url }}" alt="{{ room.name }}" class="room-image">
+        {% else %}
+            <div class="room-image-placeholder">🏢</div>
+        {% endif %}
+        <div class="room-body">
+            <h3>{{ room.name }}</h3>
+            <p class="room-desc">{{ room.description or "Описание отсутствует" }}</p>
+            <div class="room-meta">
+                <span>👥 {{ room.capacity }} чел.</span>
+                <span>🏗 Этаж {{ room.floor }}</span>
+                {% if room.equipment %}
+                    <span>🔧 {{ room.equipment }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('book_room', room_id=room.id) }}" class="btn btn-primary btn-block">Забронировать</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

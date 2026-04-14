@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<h1>⚙️ Админ-панель</h1>
+
+<!-- Добавление комнаты -->
+<section class="admin-section">
+    <h2>➕ Добавить комнату</h2>
+    <form method="POST" action="{{ url_for('add_room') }}" class="form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Название *</label>
+                <input type="text" id="name" name="name" required placeholder="Переговорка А-101">
+            </div>
+            <div class="form-group">
+                <label for="capacity">Вместимость</label>
+                <input type="number" id="capacity" name="capacity" value="6" min="1">
+            </div>
+            <div class="form-group">
+                <label for="floor">Этаж</label>
+                <input type="number" id="floor" name="floor" value="1" min="1">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" rows="2" placeholder="Оснащение, особенности..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="equipment">Оборудование</label>
+            <input type="text" id="equipment" name="equipment" placeholder="Проектор, флипчарт, ТВ...">
+        </div>
+        <div class="form-group">
+            <label for="image_url">URL изображения</label>
+            <input type="url" id="image_url" name="image_url" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить комнату</button>
+    </form>
+</section>
+
+<!-- Список комнат -->
+<section class="admin-section">
+    <h2>🏢 Комнаты</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Вмест.</th>
+                <th>Этаж</th>
+                <th>Оборудование</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr>
+                <td>{{ room.name }}</td>
+                <td>{{ room.capacity }}</td>
+                <td>{{ room.floor }}</td>
+                <td>{{ room.equipment or "—" }}</td>
+                <td>
+                    {% if room.is_active %}
+                        <span class="badge badge-success">Активна</span>
+                    {% else %}
+                        <span class="badge badge-danger">Неактивна</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('toggle_room', room_id=room.id) }}" style="display:inline">
+                        <button class="btn btn-sm btn-outline">
+                            {% if room.is_active %}Деактивировать{% else %}Активировать{% endif %}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<!-- Пользователи -->
+<section class="admin-section">
+    <h2>👥 Пользователи</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Email</th>
+                <th>Роль</th>
+                <th>Дата регистрации</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_admin %}
+                        <span class="badge badge-admin">Админ</span>
+                    {% else %}
+                        <span class="badge badge-user">Пользователь</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('toggle_admin', user_id=user.id) }}" style="display:inline">
+                        <button class="btn btn-sm btn-outline">
+                            {% if user.is_admin %}Снять админа{% else %}Назначить админа{% endif %}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<!-- Последние бронирования -->
+<section class="admin-section">
+    <h2>📋 Последние бронирования (50)</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Комната</th>
+                <th>Пользователь</th>
+                <th>Цель</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td>{{ b.booking_date }}</td>
+                <td>{{ b.start_time }} — {{ b.end_time }}</td>
+                <td>{{ b.room_name }}</td>
+                <td>{{ b.username }}</td>
+                <td>{{ b.purpose or "—" }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin_delete_booking', booking_id=b.id) }}" style="display:inline"
+                          onsubmit="return confirm('Удалить бронирование?');">
+                        <button class="btn btn-sm btn-danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Бронирование: {{ room.name }}{% endblock %}
+
+{% block content %}
+<div class="book-wrapper">
+    <div class="book-card">
+        <h2>Бронирование: {{ room.name }}</h2>
+        <p class="room-desc">{{ room.description }}</p>
+
+        <form method="POST" class="form" id="bookingForm">
+            <div class="form-group">
+                <label for="booking_date">Дата</label>
+                <input type="date" id="booking_date" name="booking_date"
+                       min="{{ today }}" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_time">Начало</label>
+                    <input type="time" id="start_time" name="start_time" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_time">Окончание</label>
+                    <input type="time" id="end_time" name="end_time" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="purpose">Цель / Описание</label>
+                <textarea id="purpose" name="purpose" rows="3"
+                          placeholder="Совещание, презентация и т.д."></textarea>
+            </div>
+
+            <!-- Мини-календарь занятости этой комнаты -->
+            <div id="roomAvailability" class="availability-box">
+                <h4>Занятость комнаты на выбранную дату</h4>
+                <div id="availabilitySlots" class="slots-container">
+                    <p class="text-muted">Выберите дату для просмотра занятости</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Забронировать</button>
+            <a href="{{ url_for('rooms') }}" class="btn btn-outline btn-block">← Назад к комнатам</a>
+        </form>
+    </div>
+</div>
+
+<script>
+const ROOM_ID = {{ room.id }};
+
+document.getElementById('booking_date').addEventListener('change', function() {
+    loadRoomAvailability(ROOM_ID, this.value);
+});
+
+document.getElementById('booking_date').valueAsDate = new Date();
+// Триггерим загрузку при открытии страницы
+loadRoomAvailability(ROOM_ID, document.getElementById('booking_date').value);
+</script>
+{% endblock %}
