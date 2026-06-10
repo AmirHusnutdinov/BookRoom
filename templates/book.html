@@ -42,6 +42,14 @@
             <button type="submit" class="btn btn-primary btn-block">Забронировать</button>
             <a href="{{ url_for('rooms') }}" class="btn btn-outline btn-block">← Назад к комнатам</a>
         </form>
+            {% if conflict_exists %}
+    <form method="POST" action="{{ url_for('request_release', room_id=room.id) }}">
+        <input type="hidden" name="booking_date" value="{{ booking_date }}">
+        <input type="hidden" name="start_time" value="{{ start_time }}">
+        <input type="hidden" name="end_time" value="{{ end_time }}">
+         <button type="submit" class="btn-request-release">Запросить перенос времени</button>
+    </form>
+    {% endif %}
     </div>
 </div>
 

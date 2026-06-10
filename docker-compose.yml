@@ -1,16 +1,35 @@
+version: "3.8"
+
 services:
   web:
     build: .
     container_name: bookroom_flask
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     env_file:
       - .env
-
-
-
     volumes:
-      - .:/app
+      - ./booking.db:/Work/booking.db
     restart: unless-stopped
-    command: flask run --host=0.0.0.0 --port=5000 --debug
-    
+
+  nginx:
+    image: nginx:alpine
+    container_name: bookroom_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  docs:
+    build:
+      context: .
+      dockerfile: docs/Dockerfile
+    container_name: bookroom_docs
+    ports:
+      - "8080:80"
+    restart: unless-stopped

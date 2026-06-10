@@ -153,4 +153,88 @@
         </tbody>
     </table>
 </section>
+
+<!-- Настройки почты (SMTP) -->
+<section class="admin-section">
+    <h2>📧 Настройки почты (SMTP)</h2>
+    {% if mail_cfg %}
+        <p style="color:#666;font-size:14px">
+            Текущий провайдер: <b>{{ mail_providers.get(mail_cfg.provider, {}).get('label', mail_cfg.provider) }}</b>,
+            адрес: <b>{{ mail_cfg.username }}</b>
+            (сервер {{ mail_cfg.mail_server }}:{{ mail_cfg.mail_port }})
+        </p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('update_mail_settings') }}" class="form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="provider">Провайдер</label>
+                <select id="provider" name="provider" onchange="toggleCustomMail()">
+                    {% for key, p in mail_providers.items() %}
+                    <option value="{{ key }}"
+                        {% if mail_cfg and mail_cfg.provider == key %}selected{% endif %}>
+                        {{ p.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mail_username">Email-адрес *</label>
+                <input type="email" id="mail_username" name="username" required
+                       value="{{ mail_cfg.username if mail_cfg else '' }}"
+                       placeholder="you@example.com">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="mail_password">Пароль приложения *</label>
+                <input type="password" id="mail_password" name="password" required
+                       placeholder="пароль приложения (app password)">
+            </div>
+            <div class="form-group">
+                <label for="mail_from">From (необязательно)</label>
+                <input type="email" id="mail_from" name="mail_from"
+                       value="{{ mail_cfg.mail_from if mail_cfg else '' }}"
+                       placeholder="по умолчанию = адрес выше">
+            </div>
+        </div>
+
+        <!-- Поля только для варианта "Другой" -->
+        <div id="custom-mail-fields" style="display:none">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mail_server">SMTP-сервер</label>
+                    <input type="text" id="mail_server" name="mail_server"
+                           value="{{ mail_cfg.mail_server if mail_cfg else '' }}"
+                           placeholder="smtp.example.com">
+                </div>
+                <div class="form-group">
+                    <label for="mail_port">Порт</label>
+                    <input type="number" id="mail_port" name="mail_port"
+                           value="{{ mail_cfg.mail_port if mail_cfg else 587 }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" name="use_tls"
+                    {% if not mail_cfg or mail_cfg.use_tls %}checked{% endif %}> TLS</label>
+                <label style="margin-left:16px"><input type="checkbox" name="use_ssl"
+                    {% if mail_cfg and mail_cfg.use_ssl %}checked{% endif %}> SSL</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить настройки почты</button>
+    </form>
+</section>
+
+<script>
+function toggleCustomMail() {
+    var sel = document.getElementById('provider').value;
+    document.getElementById('custom-mail-fields').style.display =
+        (sel === 'custom') ? 'block' : 'none';
+}
+toggleCustomMail();
+</script>
+
+
 {% endblock %}
